@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Graph on Canvas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <canvas id="graphCanvas" width="800" height="600"></canvas>
+    <div>
+        <label for="vertexColor">Vertex Color:</label>
+        <input type="color" id="vertexColor">
+    </div>
+    <div>
+        <label for="vertexDiameter">Vertex Diameter:</label>
+        <input type="range" id="vertexDiameter" min="1" max="20">
+    </div>
+    <div>
+        <label for="edgeColor">Edge Color:</label>
+        <input type="color" id="edgeColor">
+    </div>
+    <div>
+        <label for="edgeThickness">Edge Thickness:</label>
+        <input type="range" id="edgeThickness" min="1" max="10">
+    </div>
+    <button id="resetButton">Reset</button>
+    <script src="script.js"></script>
+</body>
+</html>
