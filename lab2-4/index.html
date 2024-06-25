@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Graph</title>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+        }
+        .column1 {
+            text-align: right;
+            padding-right: 30px;
+        }
+        .column2 {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<svg id="mySVG" width="500" height="500" style="border:1px solid #d3d3d3;">
+    <circle cx="100" cy="300" r="50" stroke="#008181" stroke-width="2" fill="none"></circle>
+    <line id="lineUp" x1="135.4" y1="264.6" x2="185.4" y2="164.6" stroke="#008181" stroke-width="2"></line>
+    <line id="lineRight" x1="135.4" y1="264.6" x2="235.4" y2="314.6" stroke="#008181" stroke-width="2"></line>
+    <line id="lineRightFromTop" x1="185.4" y1="164.6" x2="285.4" y2="164.6" stroke="#008181" stroke-width="2"></line>
+    <line id="lineRightFromBottomEnd" x1="235.4" y1="314.6" x2="335.4" y2="314.6" stroke="#008181" stroke-width="2"></line>
+    <line id="lineToConnectRightEnds" x1="285.4" y1="164.6" x2="335.4" y2="314.6" stroke="#008181" stroke-width="2"></line>
+    <path d="M 285.4 164.6 Q 210 270 235.4 314.6" stroke="#008181" stroke-width="2" fill="none"></path>
+    <circle id="vertex" cx="135.4" cy="264.6" r="5" stroke="none" fill="#FF0000"></circle>
+    <circle id="vertexEndUp" cx="185.4" cy="164.6" r="5" stroke="none" fill="#FF0000"></circle>
+    <circle id="vertexEndRight" cx="235.4" cy="314.6" r="5" stroke="none" fill="#FF0000"></circle>
+    <circle id="vertexEndRightFromTop" cx="285.4" cy="164.6" r="5" stroke="none" fill="#FF0000"></circle>
+    <circle id="vertexEndRightFromBottomEnd" cx="335.4" cy="314.6" r="5" stroke="none" fill="#FF0000"></circle>
+</svg>
+
+<table align="center">
+    <tr>
+        <td class="column1">Vertex Color:</td>
+        <td class="column2">
+            <input type="color" id="vertexColor" value="#FF0000">
+        </td>
+    </tr>
+    <tr>
+        <td class="column1">Vertex Diameter:</td>
+        <td class="column2">
+            <input type="range" id="vertexDiameter" min="1" max="50" value="5">
+        </td>
+    </tr>
+    <tr>
+        <td class="column1">Edge Color:</td>
+        <td class="column2">
+            <input type="color" id="edgeColor" value="#008181">
+        </td>
+    </tr>
+    <tr>
+        <td class="column1">Edge Thickness:</td>
+        <td class="column2">
+            <input type="range" id="edgeThickness" min="1" max="10" value="2">
+        </td>
+    </tr>
+</table>
+
+<button id="resetButton">Reset</button>
+
+<script>
+var svg = document.getElementById("mySVG");
+
+var vertexColorInput = document.getElementById("vertexColor");
+var vertexDiameterInput = document.getElementById("vertexDiameter");
+var edgeColorInput = document.getElementById("edgeColor");
+var edgeThicknessInput = document.getElementById("edgeThickness");
+var resetButton = document.getElementById("resetButton");
+
+function saveSettings() {
+    localStorage.setItem("vertexColor", vertexColorInput.value);
+    localStorage.setItem("vertexDiameter", vertexDiameterInput.value);
+    localStorage.setItem("edgeColor", edgeColorInput.value);
+    localStorage.setItem("edgeThickness", edgeThicknessInput.value);
+}
+
+function loadSettings() {
+    if (localStorage.getItem("vertexColor")) {
+        vertexColorInput.value = localStorage.getItem("vertexColor");
+    }
+    if (localStorage.getItem("vertexDiameter")) {
+        vertexDiameterInput.value = localStorage.getItem("vertexDiameter");
+    }
+    if (localStorage.getItem("edgeColor")) {
+        edgeColorInput.value = localStorage.getItem("edgeColor");
+    }
+    if (localStorage.getItem("edgeThickness")) {
+        edgeThicknessInput.value = localStorage.getItem("edgeThickness");
+    }
+}
+
+function resetSettings() {
+    localStorage.removeItem("vertexColor");
+    localStorage.removeItem("vertexDiameter");
+    localStorage.removeItem("edgeColor");
+    localStorage.removeItem("edgeThickness");
+    vertexColorInput.value = "#FF0000";
+    vertexDiameterInput.value = "6";
+    edgeColorInput.value = "#008181";
+    edgeThicknessInput.value = "4";
+    draw();
+}
+
+function draw() {
+    while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+    }
+
+    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", 100);
+    circle.setAttribute("cy", 300);
+    circle.setAttribute("r", 50);
+    circle.setAttribute("stroke", edgeColorInput.value);
+    circle.setAttribute("stroke-width", edgeThicknessInput.value);
+    circle.setAttribute("fill", "none");
+    svg.appendChild(circle);
+
+    var vertexX = 100 + 50 * Math.cos(-Math.PI / 4);
+    var vertexY = 300 + 50 * Math.sin(-Math.PI / 4);
+
+    var lineUp = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineUp.setAttribute("x1", vertexX);
+    lineUp.setAttribute("y1", vertexY);
+    lineUp.setAttribute("x2", vertexX + 50);
+    lineUp.setAttribute("y2", vertexY - 100);
+    lineUp.setAttribute("stroke", edgeColorInput.value);
+    lineUp.setAttribute("stroke-width", edgeThicknessInput.value);
+    svg.appendChild(lineUp);
+
+    var lineRight = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineRight.setAttribute("x1", vertexX);
+    lineRight.setAttribute("y1", vertexY);
+    lineRight.setAttribute("x2", vertexX + 100);
+    lineRight.setAttribute("y2", vertexY + 50);
+    lineRight.setAttribute("stroke", edgeColorInput.value);
+    lineRight.setAttribute("stroke-width", edgeThicknessInput.value);
+    svg.appendChild(lineRight);
+
+    var vertexEndUp = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndUp.setAttribute("cx", vertexX + 50);
+    vertexEndUp.setAttribute("cy", vertexY - 100);
+    vertexEndUp.setAttribute("r", vertexDiameterInput.value);
+    vertexEndUp.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndUp);
+
+    var vertexEndRight = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndRight.setAttribute("cx", vertexX + 100);
+    vertexEndRight.setAttribute("cy", vertexY + 50);
+    vertexEndRight.setAttribute("r", vertexDiameterInput.value);
+    vertexEndRight.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndRight);
+
+    var lineRightFromTop = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineRightFromTop.setAttribute("x1", vertexX + 50);
+    lineRightFromTop.setAttribute("y1", vertexY - 100);
+    lineRightFromTop.setAttribute("x2", vertexX + 150);
+    lineRightFromTop.setAttribute("y2", vertexY - 100);
+    lineRightFromTop.setAttribute("stroke", edgeColorInput.value);
+    lineRightFromTop.setAttribute("stroke-width", edgeThicknessInput.value);
+    svg.appendChild(lineRightFromTop);
+
+    var vertexEndRightFromTop = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndRightFromTop.setAttribute("cx", vertexX + 150);
+    vertexEndRightFromTop.setAttribute("cy", vertexY - 100);
+    vertexEndRightFromTop.setAttribute("r", vertexDiameterInput.value);
+    vertexEndRightFromTop.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndRightFromTop);
+
+    var lineToEndRight = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineToEndRight.setAttribute("x1", vertexX + 150);
+    lineToEndRight.setAttribute("y1", vertexY - 100);
+    lineToEndRight.setAttribute("x2", vertexX + 100);
+    lineToEndRight.setAttribute("y2", vertexY + 50);
+    lineToEndRight.setAttribute("stroke", edgeColorInput.value);
+    lineToEndRight.setAttribute("stroke-width", edgeThicknessInput.value);
+    svg.appendChild(lineToEndRight);
+
+    var lineRightFromBottomEnd = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineRightFromBottomEnd.setAttribute("x1", vertexX + 100);
+    lineRightFromBottomEnd.setAttribute("y1", vertexY + 50);
+    lineRightFromBottomEnd.setAttribute("x2", vertexX + 200);
+    lineRightFromBottomEnd.setAttribute("y2", vertexY - 10);
+    lineRightFromBottomEnd.setAttribute("stroke", edgeColorInput.value);
+    lineRightFromBottomEnd.setAttribute("stroke-width", edgeThicknessInput.value);
+    svg.appendChild(lineRightFromBottomEnd);
+
+    var vertexEndRightFromBottomEnd = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndRightFromBottomEnd.setAttribute("cx", vertexX + 200);
+    vertexEndRightFromBottomEnd.setAttribute("cy", vertexY - 10);
+    vertexEndRightFromBottomEnd.setAttribute("r", vertexDiameterInput.value);
+    vertexEndRightFromBottomEnd.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndRightFromBottomEnd);
+
+    var lineToConnectRightEnds = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineToConnectRightEnds.setAttribute("x1", vertexX + 200);
+    lineToConnectRightEnds.setAttribute("y1", vertexY - 10);
+    lineToConnectRightEnds.setAttribute("x2", vertexX + 150);
+    lineToConnectRightEnds.setAttribute("y2", vertexY - 100);
+    lineToConnectRightEnds.setAttribute("stroke", edgeColorInput.value);
+    lineToConnectRightEnds.setAttribute("stroke-width", edgeThicknessInput.value);
+    svg.appendChild(lineToConnectRightEnds);
+
+    var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    var d = "M" + (vertexX + 150) + "," + (vertexY - 100) +
+            " Q" + ((vertexX + 150 + vertexX - 10) / 2) + "," + ((vertexY - 50 + vertexY + 50) / 2 - 50) +
+            " " + (vertexX + 100) + "," + (vertexY + 50);
+    path.setAttribute("d", d);
+    path.setAttribute("stroke", edgeColorInput.value);
+    path.setAttribute("stroke-width", edgeThicknessInput.value);
+    path.setAttribute("fill", "none");
+    svg.appendChild(path);
+
+    var vertex = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertex.setAttribute("cx", vertexX);
+    vertex.setAttribute("cy", vertexY);
+    vertex.setAttribute("r", vertexDiameterInput.value);
+    vertex.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertex);
+
+    var vertexEndUp = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndUp.setAttribute("cx", vertexX + 50);
+    vertexEndUp.setAttribute("cy", vertexY - 100);
+    vertexEndUp.setAttribute("r", vertexDiameterInput.value);
+    vertexEndUp.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndUp);
+
+    var vertexEndRight = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndRight.setAttribute("cx", vertexX + 100);
+    vertexEndRight.setAttribute("cy", vertexY + 50);
+    vertexEndRight.setAttribute("r", vertexDiameterInput.value);
+    vertexEndRight.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndRight);
+
+    var vertexEndRightFromTop = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndRightFromTop.setAttribute("cx", vertexX + 150);
+    vertexEndRightFromTop.setAttribute("cy", vertexY - 100);
+    vertexEndRightFromTop.setAttribute("r", vertexDiameterInput.value);
+    vertexEndRightFromTop.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndRightFromTop);
+
+    var vertexEndRightFromBottomEnd = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    vertexEndRightFromBottomEnd.setAttribute("cx", vertexX + 200);
+    vertexEndRightFromBottomEnd.setAttribute("cy", vertexY - 10);
+    vertexEndRightFromBottomEnd.setAttribute("r", vertexDiameterInput.value);
+    vertexEndRightFromBottomEnd.setAttribute("fill", vertexColorInput.value);
+    svg.appendChild(vertexEndRightFromBottomEnd);
+
+    saveSettings();
+}
+
+vertexColorInput.addEventListener("input", draw);
+vertexDiameterInput.addEventListener("input", draw);
+edgeColorInput.addEventListener("input", draw);
+edgeThicknessInput.addEventListener("input", draw);
+
+resetButton.addEventListener("click", resetSettings);
+
+loadSettings();
+draw();
+</script>
+
+</body>
+</html>
